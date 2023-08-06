@@ -1,13 +1,12 @@
-const ws = new WebSocket('ws://localhost:5557')
 const connectedToChat = document.querySelector('.btn');
 const messageInput = document.querySelector('.message');
 const messagesContainer = document.querySelector('.messages');
 const connectionStatus = document.querySelector('.info-status');
 const userName = document.querySelector('.username');
 const userActive = document.querySelector('.user-active');
-const labelName = document.querySelector('.label-name')
+const labelName = document.querySelector('.label-name');
 
-connectionStatus.textContent = 'Not connected'
+connectionStatus.textContent = 'Not connected';
 connectionStatus.style.color = 'red';
 messageInput.style.display = 'none';
 
@@ -19,13 +18,11 @@ function getCurrentTime() {
    return `${hours}:${minutes}:${seconds}`;
 }
 
-ws.addEventListener('open', () => {
-   console.log('Connected to server');
-});
-
+let ws; // Объявляем переменную для WebSocket
 
 connectedToChat.addEventListener('click', (e) => {
    e.preventDefault();
+
    if (userName.value.trim()) {
       connectionStatus.textContent = 'Connected';
       connectionStatus.style.color = 'green';
@@ -36,20 +33,29 @@ connectedToChat.addEventListener('click', (e) => {
       connectedToChat.textContent = 'Відправити';
 
       localStorage.setItem('username', userName.value.trim());
-   } if (messageInput.value.trim()) {
+
+      // Создание и подключение к WebSocket, если еще не создан
+      if (!ws) {
+         ws = new WebSocket('ws://localhost:5557');
+
+         ws.addEventListener('open', () => {
+            console.log('Connected to server');
+         });
+
+         ws.addEventListener('message', (event) => {
+            const receivedMessage = event.data;
+            displayMessage(receivedMessage);
+         });
+      }
+   }
+
+   if (messageInput.value.trim()) {
       sendMessageToServer(messageInput.value);
       messageInput.value = '';
+   } else if (!userName.value.trim()) {
+      alert('Invalid name, please enter your name');
    }
-   else if (!userName.value.trim()) {
-      alert('Invalid name, please enter your name')
-   }
-})
-
-ws.addEventListener('message', (event) => {
-   const receivedMessage = event.data;
-   displayMessage(receivedMessage);
 });
-
 
 function sendMessageToServer(message) {
    ws.send(message);
