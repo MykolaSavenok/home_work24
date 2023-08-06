@@ -18,7 +18,7 @@ function getCurrentTime() {
    return `${hours}:${minutes}:${seconds}`;
 }
 
-let ws; // Объявляем переменную для WebSocket
+let ws;
 
 connectedToChat.addEventListener('click', (e) => {
    e.preventDefault();
@@ -34,7 +34,6 @@ connectedToChat.addEventListener('click', (e) => {
 
       localStorage.setItem('username', userName.value.trim());
 
-      // Создание и подключение к WebSocket, если еще не создан
       if (!ws) {
          ws = new WebSocket('ws://localhost:5557');
 
